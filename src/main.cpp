@@ -39,4 +39,5 @@ void loop() {
      delay(500);
    }
    */
+  myNidecMotorSys.MatchSetPoint((float)45);
 }

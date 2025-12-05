@@ -26,3 +26,11 @@ void Nidec24::MatchSetPoint(float &setPoint) {
   _outputK->Drive(_motorSpeed);
   _timeOld = _timeCurrent;
 };
+
+void Nidec24::MatchSetPoint(const float &setPoint) {
+  _timeCurrent = millis();
+  float angleError = setPoint - _measurementK->GetAngle();
+  _controlK->ControlSignal(_motorSpeed, angleError, _timeCurrent - _timeOld);
+  _outputK->Drive(_motorSpeed);
+  _timeOld = _timeCurrent;
+}

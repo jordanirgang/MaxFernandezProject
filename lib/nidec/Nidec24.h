@@ -18,5 +18,7 @@ public:
   Nidec24(Nidec24Motor *motor, IFeedbackAngle<float> *feedback,
           IController<float> *ctlSys);
   void MatchSetPoint(float &setPoint, unsigned long &deltaT);
+
   void MatchSetPoint(float &setPoint);
+  void MatchSetPoint(const float &setPoint);
 };
