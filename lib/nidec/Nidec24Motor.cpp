@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <NIDEC_24.h>
+#include <Nidec24Motor.h>
 
 void Nidec24Motor::Drive(float speed )
 {
