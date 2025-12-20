@@ -1,0 +1,98 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Nidec24 {
+    - _controlK : IController<float>*
+    - _measurementK : IFeedbackAngle<float>*
+    - _outputK : Nidec24Motor*
+    - _motorSpeed : float = 0
+    - _timeCurrent : unsigned long = 0
+    - _timeOld : unsigned long = 0
+    --
+    + Nidec24()
+    + Nidec24(motor : Nidec24Motor*, feedback : IFeedbackAngle<float>*, ctlSys : IController<float>*)
+    + MatchSetPoint(setPoint : float&, deltaT : unsigned long&) : void
+    + MatchSetPoint(setPoint : float&) : void
+    + MatchSetPoint(setPoint : const float&) : void
+}
+
+interface IController<T>
+interface IFeedbackAngle<T>
+class Nidec24Motor
+interface IController<T> {
+    + IController()
+    + {abstract} ControlSignal(signalIO : T&, error : T&, timestep : unsigned long) : void
+}
+
+class IFeedbackAngle<T> {
+    + value : T
+    --
+    + IFeedbackAngle()
+    + {abstract} GetAngle() : T
+    + {abstract} SetAngle(arg0 : T) : void
+}
+
+interface "IController<U>" as IController {
+}
+
+class "SisoController<U>" as SisoController {
+    - _errorHistory : U[4]
+    - _signalOutHistory : U[4]
+    + SisoController()
+    + ControlSignal(signalIO : U&, error : U&, timestep : unsigned long) : void
+}
+
+IController <|-- SisoController
+
+' Relationships based on pointer member variables
+Nidec24 "1" o-- "1" IController : uses
+Nidec24 "1" o-- "1" IFeedbackAngle : uses
+Nidec24 "1" o-- "1" Nidec24Motor : uses
+
+class "PotFeedback<U>" as PotFeedback {
+    .. Data Members ..
+    + _angle : U
+    + _readPin : int
+    + minVoltage : int = 0
+    + maxVoltage : int = 255
+    
+    .. Constructors ..
+    + PotFeedback()
+    + PotFeedback(wiperPin : const int&)
+    
+    .. Methods ..
+    + SetUp(wiperPin : const int) : void
+    + SetAngle(angle : U) : void
+    + SetAngle() : void
+    + GetAngle() : U
+}
+
+class "UnityFeedbackController<U>" as UnityFeedbackController {
+    + ControlSignal(signalIO: U&, error: U&, timestep: unsigned long&): void
+}
+
+IController <|-- UnityFeedbackController
+
+IFeedbackAngle <|-- PotFeedback
+
+class Nidec24Motor {
+    - _direction : bool = FORWARD
+    - _brakePin : int
+    - _directionPin : int
+    - _enablePin : int
+    - _ctlPin : int
+    + speedVirtualOut : float = 0
+    + isPWM : bool = false
+    --
+    + Nidec24Motor(ctl: const int&, brake: const int&, \ndirection: const int&, enable: const int&)
+    + Nidec24Motor()
+    + Drive(speed: float) : void
+}
+
+' Relationships (Composition)
+Nidec24 o-- Nidec24Motor : references
+Nidec24 o-- PotFeedback : references
+Nidec24 o-- SisoController : references
+
+note top of Nidec24 : This is the main system aggregator
+@enduml
